@@ -40,7 +40,7 @@ jobs:
           sed -i "s/__version__ = .*/__version__ = \"${VERSION}\"/g" src/__init__.py
           git add src/__init__.py
           git commit --no-verify -m "chore(release): ${VERSION}"
-          npm run release
+          npx standard-version
           git tag -d v$VERSION
           git reset --soft HEAD~~ && git commit --no-verify --no-edit -m "chore(release): ${VERSION}"
           git tag v$VERSION
