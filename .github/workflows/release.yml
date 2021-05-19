@@ -29,14 +29,16 @@ jobs:
           npm ci
       - name: Commit files
         env:
-          HUSKY_SKIP_HOOKS: 1 
+          HUSKY_SKIP_HOOKS: 1
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           VERSION=$(npx next-standard-version)
-          _DESCRIPTION=$(npx standard-version --dry-run --silent | grep -v yarn | grep -v Done | grep -v "\-\-\-" | grep -v standard-version)
-          echo >>$GITHUB_ENV _DESCRIPTION=$_DESCRIPTION
-          echo >>$GITHUB_ENV VERSION=$VERSION
+          DESCRIPTION=$(npx standard-version --dry-run --silent | grep -v yarn | grep -v Done | grep -v "\-\-\-" | grep -v standard-version)
+          echo "DESCRIPTION<<EOF" >> $GITHUB_ENV
+          echo "$DESCRIPTION" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_ENV 
           sed -i "s/__version__ = .*/__version__ = \"${VERSION}\"/g" src/__init__.py
           git add src/__init__.py
           git commit --no-verify -m "chore(release): ${VERSION}"
@@ -58,6 +60,6 @@ jobs:
           tag_name: v${{ env.VERSION }}
           release_name: Release v${{ env.VERSION }}
           body: |
-            ${{ env._DESCRIPTION }}
+            ${{ env.DESCRIPTION }}
           draft: false
           prerelease: false
